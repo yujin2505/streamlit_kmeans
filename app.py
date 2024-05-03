@@ -1,11 +1,3 @@
-# 그래프에 한글 나오게 하는 코드
-import platform
-import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
-plt.rcParams['axes.unicode_minus'] = False
-if platform.system() == 'Linux':
-    rc('font', family='NanumGothic')
-
 import streamlit as st
 import pandas as pd
 
@@ -15,6 +7,12 @@ from sklearn.compose import ColumnTransformer  #컬럼 트랜스포머 대신에
 from sklearn.cluster import KMeans
 import numpy as np
 
+import matplotlib.pyplot as plt
+import platform
+from matplotlib import font_manager, rc
+plt.rcParams['axes.unicode_minus'] = False
+if platform.system() == 'Linux':
+    rc('font', family='NanumGothic')
 
 
 def main():
@@ -68,9 +66,9 @@ def main():
         
         X = df[selected_columns]
         
-        if len(selected_columns) !=0:
+        if len(selected_columns) != 0:
             st.dataframe(X)
-            
+        
             if len(selected_columns) >= 2 :
                 
                 X_new = pd.DataFrame()  # 빈 데이터프레임 만들기 
@@ -95,7 +93,7 @@ def main():
                         
                     else :  
                         X_new[column] = X[column] #숫자데이터처리
-            
+                
             
             # 4-1 인덱스값을 다시 초기화시켜준다
            
@@ -106,7 +104,7 @@ def main():
             
             st.subheader('클러스터링에 실제 사용할 데이터')
             st.dataframe(X_new)
-                
+            
             # 5. k의 갯수를 1개부터 10개까지 해서 wcss를 구한다
             
             wcss = []
@@ -117,35 +115,40 @@ def main():
             
             # 6. elbow method를 이용해서, 차트로 보여준다
             fig1 = plt.figure()
-            x = np.arange(1,10+1)
+            x = np.arange(1, 10+1)
             plt.plot(x, wcss)
             plt.title('엘보우 메소드')
             plt.xlabel('클러스터의 갯수')
             plt.ylabel('WCSS')
             st.pyplot(fig1)
-            
+
             # 7. 유저가 k의 갯수를 지정한다
             k = st.slider('클러스터 갯수 설정', 1, 10)
+            
 
             # 8. K-Means 수행해서 그룹정보를 가져온다
             kmeans = KMeans(n_clusters=k, random_state=5)
             y_pred = kmeans.fit_predict(X_new)
-            
+
+
             # 9. 원래 있던 df에 Group이라는 새로운 column을 만들어 데이터를 넣어준다.     
             df['Group'] = y_pred
-            
+
             # 10. 결과를 파일로 저장한다.
             df.to_csv('result.csv')
-            
-            # 11. 유저에게 보여준다
-            st.subheader('클러스터링 결과')
-            st.dataframe(df)
-            
-            # 12. 유저가 그룹을 선택하면 해당 그룹의 정보를 보여준다
-            choice = st.selectbox('그룹을 선택하세요', np.arange(0, k))
-            
-            st.dataframe(df.loc[ df['Group']==choice , ])
-                
 
-    if __name__ == '__main__' :
-        main()
+            # 11. 유저에게 보여준다.
+            st.subheader('클러스터링 결과')
+
+            st.dataframe(df)
+
+            # 12. 유저가 그룹을 선택하면, 해당 그룹의 정보를 보여준다.
+
+            choice_group = st.selectbox('그룹을 선택하세요', np.arange(0, k))
+
+            st.dataframe(df.loc[df['Group'] == choice_group , ])
+
+    
+
+if __name__ == '__main__' :
+    main()
