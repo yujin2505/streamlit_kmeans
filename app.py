@@ -1,3 +1,11 @@
+# 그래프에 한글 나오게 하는 코드
+import platform
+import matplotlib.pyplot as plt
+from matplotlib import font_manager, rc
+plt.rcParams['axes.unicode_minus'] = False
+if platform.system() == 'Linux':
+    rc('font', family='NanumGothic')
+
 import streamlit as st
 import pandas as pd
 
@@ -7,14 +15,6 @@ from sklearn.compose import ColumnTransformer  #컬럼 트랜스포머 대신에
 from sklearn.cluster import KMeans
 import numpy as np
 
-
-# 그래프에 한글 나오게 하는 코드
-import platform
-import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
-plt.rcParams['axes.unicode_minus'] = False
-if platform.system() == 'Linux':
-    rc('font', family='NanumGothic')
 
 
 def main():
