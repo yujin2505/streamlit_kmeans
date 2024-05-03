@@ -5,8 +5,17 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.compose import ColumnTransformer  #컬럼 트랜스포머 대신에 더미스를 사용해도 된다.
 
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 import numpy as np
+
+
+# 그래프에 한글 나오게 하는 코드
+import platform
+import matplotlib.pyplot as plt
+from matplotlib import font_manager, rc
+plt.rcParams['axes.unicode_minus'] = False
+if platform.system() == 'Linux':
+    rc('font', family='NanumGothic')
+
 
 def main():
     st.title('K-Means 클러스터링 앱')
@@ -59,32 +68,33 @@ def main():
         
         X = df[selected_columns]
         
-        st.dataframe(X)
-        
-        if len(selected_columns) >= 2 :
+        if len(selected_columns) !=0:
+            st.dataframe(X)
             
-            X_new = pd.DataFrame()  # 빈 데이터프레임 만들기 
-            
-            print(X_new)
-            
-            # 4. 해당 컬럼의 데이터가 문자열이면, 숫자로 바꿔주자.
-            
-            for column in X.columns :
-                print( X[column].dtype ) 
+            if len(selected_columns) >= 2 :
                 
-                # 컬럼의 데이터가 문자열이면, 레이블인코딩 또는 원핫인코딩 해야 한다
-                if X[column].dtype == object :
+                X_new = pd.DataFrame()  # 빈 데이터프레임 만들기 
+                
+                print(X_new)
+                
+                # 4. 해당 컬럼의 데이터가 문자열이면, 숫자로 바꿔주자.
+                
+                for column in X.columns :
+                    print( X[column].dtype ) 
                     
-                    if X[column].nunique() >= 3 :          
-                        column_names = sorted( X[column].unique() )   #원핫 인코딩
-                        X_new[column_names] = pd.get_dummies( X[column].to_frame() )  #비어있는 데이터프레임에 컬럼 추가
-                    
-                    else :
-                        encoder = LabelEncoder() #레이블 인코딩
-                        X_new[column] = encoder.fit_transform( X[column] )                    
-                    
-                else :  
-                    X_new[column] = X[column] #숫자데이터처리
+                    # 컬럼의 데이터가 문자열이면, 레이블인코딩 또는 원핫인코딩 해야 한다
+                    if X[column].dtype == object :
+                        
+                        if X[column].nunique() >= 3 :          
+                            column_names = sorted( X[column].unique() )   #원핫 인코딩
+                            X_new[column_names] = pd.get_dummies( X[column].to_frame() )  #비어있는 데이터프레임에 컬럼 추가
+                        
+                        else :
+                            encoder = LabelEncoder() #레이블 인코딩
+                            X_new[column] = encoder.fit_transform( X[column] )                    
+                        
+                    else :  
+                        X_new[column] = X[column] #숫자데이터처리
             
             
             # 4-1 인덱스값을 다시 초기화시켜준다
@@ -96,7 +106,7 @@ def main():
             
             st.subheader('클러스터링에 실제 사용할 데이터')
             st.dataframe(X_new)
-            
+                
             # 5. k의 갯수를 1개부터 10개까지 해서 wcss를 구한다
             
             wcss = []
@@ -109,7 +119,8 @@ def main():
             fig1 = plt.figure()
             x = np.arange(1,10+1)
             plt.plot(x, wcss)
-            plt.xlabel('Number of Clusters')
+            plt.title('엘보우 메소드')
+            plt.xlabel('클러스터의 갯수')
             plt.ylabel('WCSS')
             st.pyplot(fig1)
             
@@ -134,7 +145,7 @@ def main():
             choice = st.selectbox('그룹을 선택하세요', np.arange(0, k))
             
             st.dataframe(df.loc[ df['Group']==choice , ])
-            
+                
 
-if __name__ == '__main__' :
-    main()
+    if __name__ == '__main__' :
+        main()
